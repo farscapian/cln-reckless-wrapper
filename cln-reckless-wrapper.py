@@ -24,27 +24,58 @@ plugin = Plugin()
 @plugin.init()  # this runs when the plugin starts.
 def init(options, configuration, plugin, **kwargs):
 
-    # get the plugin path from the os env
-    plugin_path = os.environ.get('PLUGIN_PATH')
 
     plugin.log("cln-reckless-wrapper")
 
-@plugin.method("reckless-install")
-def reckless_install(plugin, repo_URL, hours):
+
+@plugin.method("reckless-sourcelist")
+def reckless_install(plugin, repo_url, hours):
     '''Returns a BOLT11 invoice for the given node count and time.'''
     try:
-        params = [f"--invoice-id={invoice_id}", f"--expiration-date={unix_timestamp}" ]
+        params = [f"--invoice-id={invoice_id}" ]
 
         result = None
 
+        # get the plugin path from the os env
+        plugin_path = os.environ.get('PLUGIN_PATH')
+
+        provision_script_path = f"{plugin_path}/cln-reckless-wrapper.py"
+
         try:
-            plugin.log(f"Starting lnplay provisioning script for Order {invoice_id}")
-            result = subprocess.run([provision_script_path] + params)
+            plugin.log(f"reckless-sourcelist")
+            # + params
+            result = subprocess.run(['python3', provision_script_path] + params)
 
         except subprocess.CalledProcessError as e:
             plugin.log(f"The bash script exited with error code: {e.returncode}")
 
-    #reckless source add https://my.repo.url/here
+    #reckless source add https://github.com/farscapian/cln-reckless-wrapper.git
+    except RpcError as e:
+        plugin.log(e)
+        return e
+
+    return result
+
+
+@plugin.method("reckless-install")
+def reckless_install(plugin, repo_url, hours):
+    '''Returns a BOLT11 invoice for the given node count and time.'''
+    try:
+        params = [f"--invoice-id={invoice_id}" ]
+
+        result = None
+
+        provision_script_path = f"{plugin_path}/cln-reckless-wrapper.py"
+
+        try:
+            plugin.log(f"About to call reckless.py")
+            # + params
+            result = subprocess.run(['python', provision_script_path] + params)
+
+        except subprocess.CalledProcessError as e:
+            plugin.log(f"The bash script exited with error code: {e.returncode}")
+
+    #reckless source add https://github.com/farscapian/cln-reckless-wrapper.git
     except RpcError as e:
         plugin.log(e)
         return e
