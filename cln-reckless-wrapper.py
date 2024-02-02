@@ -24,63 +24,82 @@ plugin = Plugin()
 @plugin.init()  # this runs when the plugin starts.
 def init(options, configuration, plugin, **kwargs):
 
+    plugin.log("initializing cln-reckless-wrapper.py.")
 
-    plugin.log("cln-reckless-wrapper")
+
+# this is called by all the other rpc methods.
+# each invoker passes params.
+def execute_reckless(params="-r"):
+
+    output = None
+    
+    try:
+
+        reckless_script_path = f"/usr/local/bin/reckless"
+        result = None
+        if params == "-r":
+            result = subprocess.run([reckless_script_path], stdout=subprocess.PIPE, text=True, check=True)
+        else:
+            result = subprocess.run([reckless_script_path] + params, stdout=subprocess.PIPE, text=True, check=True)
+
+        output = result.stdout
+
+    except RpcError as e:
+        plugin.log(e)
+        return e
+
+    return output.strip()
+
+
+
+@plugin.method("reckless-help")
+def reckless_help(plugin):
+    '''reckless help'''
+
+    return execute_reckless(params=[ "-r", "help" ])
 
 
 @plugin.method("reckless-sourcelist")
-def reckless_install(plugin, repo_url, hours):
-    '''Returns a BOLT11 invoice for the given node count and time.'''
-    try:
-        params = [f"--invoice-id={invoice_id}" ]
+def reckless_sourcelist(plugin):
+    '''reckless source list'''
+    
+    return execute_reckless(params=[ "-r", "source", "list" ])
 
-        result = None
+@plugin.method("reckless-sourceadd")
+def reckless_sourceadd(plugin):
+    '''reckless source add'''
 
-        # get the plugin path from the os env
-        plugin_path = os.environ.get('PLUGIN_PATH')
+    return ""
 
-        provision_script_path = f"{plugin_path}/cln-reckless-wrapper.py"
+@plugin.method("reckless-sourcerm")
+def reckless_sourcerm(plugin):
+    '''reckless source rm'''
 
-        try:
-            plugin.log(f"reckless-sourcelist")
-            # + params
-            result = subprocess.run(['python3', provision_script_path] + params)
-
-        except subprocess.CalledProcessError as e:
-            plugin.log(f"The bash script exited with error code: {e.returncode}")
-
-    #reckless source add https://github.com/farscapian/cln-reckless-wrapper.git
-    except RpcError as e:
-        plugin.log(e)
-        return e
-
-    return result
-
+    return "" 
 
 @plugin.method("reckless-install")
-def reckless_install(plugin, repo_url, hours):
-    '''Returns a BOLT11 invoice for the given node count and time.'''
-    try:
-        params = [f"--invoice-id={invoice_id}" ]
+def reckless_install(plugin):
+    '''reckless install <repo_url>'''
 
-        result = None
+    return "" 
 
-        provision_script_path = f"{plugin_path}/cln-reckless-wrapper.py"
+@plugin.method("reckless-uninstall")
+def reckless_uninstall(plugin):
+    '''reckless uninstall <repo_url>'''
 
-        try:
-            plugin.log(f"About to call reckless.py")
-            # + params
-            result = subprocess.run(['python', provision_script_path] + params)
+    return "" 
 
-        except subprocess.CalledProcessError as e:
-            plugin.log(f"The bash script exited with error code: {e.returncode}")
+@plugin.method("reckless-search")
+def reckless_search(plugin):
+    '''reckless search search_string="example_plugin"'''
 
-    #reckless source add https://github.com/farscapian/cln-reckless-wrapper.git
-    except RpcError as e:
-        plugin.log(e)
-        return e
+    return "" 
 
-    return result
 
+@plugin.method("reckless-disable")
+def reckless_disable(plugin):
+    '''reckless help'''
+
+    return "" 
 
 plugin.run()  # Run our plugin
