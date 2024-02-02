@@ -34,7 +34,6 @@ def execute_reckless(params="-r"):
     output = None
     
     try:
-
         reckless_script_path = f"/usr/local/bin/reckless"
         result = None
         if params == "-r":
@@ -51,55 +50,55 @@ def execute_reckless(params="-r"):
     return output.strip()
 
 
-
+# DONE
 @plugin.method("reckless-help")
 def reckless_help(plugin):
     '''reckless help'''
 
     return execute_reckless(params=[ "-r", "help" ])
 
-
+# DONE
 @plugin.method("reckless-sourcelist")
 def reckless_sourcelist(plugin):
     '''reckless source list'''
     
     return execute_reckless(params=[ "-r", "source", "list" ])
 
+
 @plugin.method("reckless-sourceadd")
-def reckless_sourceadd(plugin):
+def reckless_sourceadd(plugin, ):
     '''reckless source add'''
 
-    return ""
+    return execute_reckless(params=[ "-r", "source", "add", f"{repo_url}" ])
 
 @plugin.method("reckless-sourcerm")
-def reckless_sourcerm(plugin):
+def reckless_sourcerm(plugin, repo_url=""):
     '''reckless source rm'''
 
-    return "" 
+    return execute_reckless(params=[ "-r", "source", "rm", f"{repo_url}" ])
 
 @plugin.method("reckless-install")
-def reckless_install(plugin):
-    '''reckless install <repo_url>'''
+def reckless_install(plugin, plugin_name=""):
+    '''reckless install <plugin_name>'''
 
-    return "" 
+    return execute_reckless(params=[ "-r", "install", f"{plugin_name}" ])
 
 @plugin.method("reckless-uninstall")
-def reckless_uninstall(plugin):
-    '''reckless uninstall <repo_url>'''
+def reckless_uninstall(plugin, plugin_name=""):
+    '''reckless uninstall <plugin_name>'''
 
-    return "" 
+    return execute_reckless(params=[ "-r", "uninstall", f"{plugin_name}" ])
 
 @plugin.method("reckless-search")
-def reckless_search(plugin):
+def reckless_search(plugin, plugin_name=""):
     '''reckless search search_string="example_plugin"'''
 
-    return "" 
-
+    return execute_reckless(params=[ "-r", "search", f"{plugin_name}" ])
 
 @plugin.method("reckless-disable")
-def reckless_disable(plugin):
+def reckless_disable(plugin, plugin_name=""):
     '''reckless help'''
 
-    return "" 
+    return execute_reckless(params=[ "-r", "disable", f"{plugin_name}" ])
 
 plugin.run()  # Run our plugin
