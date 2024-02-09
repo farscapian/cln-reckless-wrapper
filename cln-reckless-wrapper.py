@@ -66,7 +66,7 @@ def reckless_sourcelist(plugin):
 
 
 @plugin.method("reckless-sourceadd")
-def reckless_sourceadd(plugin, ):
+def reckless_sourceadd(plugin, repo_url="" ):
     '''reckless source add'''
 
     return execute_reckless(params=[ "-r", "source", "add", f"{repo_url}" ])
