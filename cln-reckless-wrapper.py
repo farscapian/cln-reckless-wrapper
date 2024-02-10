@@ -29,7 +29,7 @@ def init(options, configuration, plugin, **kwargs):
 
 # this is called by all the other rpc methods.
 # each invoker passes params.
-def execute_reckless(params="-r"):
+def execute_reckless(params):
 
     output = None
     
@@ -46,6 +46,9 @@ def execute_reckless(params="-r"):
     except RpcError as e:
         plugin.log(e)
         return e
+
+    if output == "":
+        return true
 
     return output.strip()
 
@@ -66,37 +69,37 @@ def reckless_sourcelist(plugin):
 
 
 @plugin.method("reckless-sourceadd")
-def reckless_sourceadd(plugin, repo_url="" ):
+def reckless_sourceadd(plugin, repo_url ):
     '''reckless source add'''
 
     return execute_reckless(params=[ "-r", "source", "add", f"{repo_url}" ])
 
 @plugin.method("reckless-sourcerm")
-def reckless_sourcerm(plugin, repo_url=""):
+def reckless_sourcerm(plugin, repo_url):
     '''reckless source rm'''
 
     return execute_reckless(params=[ "-r", "source", "rm", f"{repo_url}" ])
 
 @plugin.method("reckless-install")
-def reckless_install(plugin, plugin_name=""):
+def reckless_install(plugin, plugin_name):
     '''reckless install <plugin_name>'''
 
     return execute_reckless(params=[ "-r", "install", f"{plugin_name}" ])
 
 @plugin.method("reckless-uninstall")
-def reckless_uninstall(plugin, plugin_name=""):
+def reckless_uninstall(plugin, plugin_name):
     '''reckless uninstall <plugin_name>'''
 
     return execute_reckless(params=[ "-r", "uninstall", f"{plugin_name}" ])
 
 @plugin.method("reckless-search")
-def reckless_search(plugin, plugin_name=""):
-    '''reckless search search_string="example_plugin"'''
+def reckless_search(plugin, plugin_name):
+    '''reckless search <plugin_name>'''
 
     return execute_reckless(params=[ "-r", "search", f"{plugin_name}" ])
 
 @plugin.method("reckless-disable")
-def reckless_disable(plugin, plugin_name=""):
+def reckless_disable(plugin, plugin_name):
     '''reckless help'''
 
     return execute_reckless(params=[ "-r", "disable", f"{plugin_name}" ])
