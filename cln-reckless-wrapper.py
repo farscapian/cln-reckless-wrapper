@@ -47,10 +47,14 @@ def execute_reckless(params):
         plugin.log(e)
         return e
 
-    if output == "":
-        return true
+    return_output = output.strip()
 
-    return output.strip()
+    if return_output == "":
+        return_output = "success"
+
+    return {
+        "output": f"{return_output}"
+    }
 
 
 # DONE
