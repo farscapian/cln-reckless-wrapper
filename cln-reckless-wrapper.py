@@ -2,22 +2,8 @@
 import json
 import os
 import re
-import time
 import subprocess
-import uuid
 from pyln.client import Plugin, RpcError
-from datetime import datetime, timedelta
-
-lnlive_plugin_api_version = "v0.0.1"
-
-plugin_out = "/tmp/plugin_out"
-if os.path.isfile(plugin_out):
-    os.remove(plugin_out)
-
-# use this for debugging-
-def printout(s):
-    with open(plugin_out, "a") as output:
-        output.write(s)
 
 plugin = Plugin()
 
@@ -26,21 +12,16 @@ def init(options, configuration, plugin, **kwargs):
 
     plugin.log("initializing cln-reckless-wrapper.py.")
 
-
 # this is called by all the other rpc methods.
 # each invoker passes params.
-def execute_reckless(params):
+def execute_reckless(params="-r"):
 
     output = None
     
     try:
         reckless_script_path = f"/usr/local/bin/reckless"
         result = None
-        if params == "-r":
-            result = subprocess.run([reckless_script_path], stdout=subprocess.PIPE, text=True, check=True)
-        else:
-            result = subprocess.run([reckless_script_path] + params, stdout=subprocess.PIPE, text=True, check=True)
-
+        result = subprocess.run([reckless_script_path] + params, stdout=subprocess.PIPE, text=True, check=True)
         output = result.stdout
 
     except RpcError as e:
@@ -49,13 +30,9 @@ def execute_reckless(params):
 
     return_output = output.strip()
 
-    if return_output == "":
-        return_output = "success"
-
     return {
         "output": f"{return_output}"
     }
-
 
 # DONE
 @plugin.method("reckless-help")
@@ -73,7 +50,7 @@ def reckless_sourcelist(plugin):
 
 
 @plugin.method("reckless-sourceadd")
-def reckless_sourceadd(plugin, repo_url ):
+def reckless_sourceadd(plugin, repo_url):
     '''reckless source add'''
 
     return execute_reckless(params=[ "-r", "source", "add", f"{repo_url}" ])
