@@ -30,9 +30,7 @@ def execute_reckless(params="-r"):
 
     return_output = output.strip()
 
-    return {
-        "output": f"{return_output}"
-    }
+    return return_output
 
 # DONE
 @plugin.method("reckless-help")
@@ -46,12 +44,29 @@ def reckless_help(plugin):
 def reckless_sourcelist(plugin):
     '''reckless source list'''
     
-    return execute_reckless(params=[ "-r", "source", "list" ])
+    reckless_output = execute_reckless(params=[ "-r", "source", "list" ])
+
+    sources = reckless_output.split('\n') 
+
+    json_object = { "sources": sources }
+
+    return json_object
 
 
 @plugin.method("reckless-sourceadd")
 def reckless_sourceadd(plugin, repo_url):
     '''reckless source add'''
+
+    # execute_reckless(params=[ "-r", "source", "add", f"{repo_url}" ])
+
+    # url_found = "false"
+
+    # # Lets check if the URL exists in the file. If so, we can assume the source is added.
+    # with open('/root/.lightning/reckless/.sources', 'r') as file:
+    #     for line in file:
+    #         if repo_url in line:
+    #             url_found = "true"
+    #             break  # Stop searching once the URL is found
 
     return execute_reckless(params=[ "-r", "source", "add", f"{repo_url}" ])
 
@@ -59,7 +74,11 @@ def reckless_sourceadd(plugin, repo_url):
 def reckless_sourcerm(plugin, repo_url):
     '''reckless source rm'''
 
-    return execute_reckless(params=[ "-r", "source", "rm", f"{repo_url}" ])
+    # remove the entry
+    output = execute_reckless(params=[ "-r", "source", "remove", f"{repo_url}" ])
+
+    return output
+    #reckless_sourcelist(plugin)
 
 @plugin.method("reckless-install")
 def reckless_install(plugin, plugin_name):
