@@ -23,7 +23,10 @@ def execute_reckless(params="-r"):
         result = None
         result = subprocess.run([reckless_script_path] + params, stdout=subprocess.PIPE, text=True, check=True)
         output = result.stdout
-
+        
+        if result.stderr:
+            plugin.log(error_output)
+        
     except RpcError as e:
         plugin.log(e)
         return e
@@ -44,9 +47,12 @@ def reckless_help(plugin):
 def reckless_sourcelist(plugin):
     '''reckless source list'''
     
-    reckless_output = execute_reckless(params=[ "-r", "source", "list" ])
+    reckless_output = execute_reckless(params=[ "-r",  "source", "list" ])
 
     sources = reckless_output.split('\n') 
+
+    if sources[0] == "":
+        sources = []
 
     json_object = { "sources": sources }
 
@@ -57,51 +63,68 @@ def reckless_sourcelist(plugin):
 def reckless_sourceadd(plugin, repo_url):
     '''reckless source add'''
 
-    # execute_reckless(params=[ "-r", "source", "add", f"{repo_url}" ])
+    execute_reckless(params=[ "-r",  "source", "add", f"{repo_url}" ])
 
-    # url_found = "false"
-
-    # # Lets check if the URL exists in the file. If so, we can assume the source is added.
-    # with open('/root/.lightning/reckless/.sources', 'r') as file:
-    #     for line in file:
-    #         if repo_url in line:
-    #             url_found = "true"
-    #             break  # Stop searching once the URL is found
-
-    return execute_reckless(params=[ "-r", "source", "add", f"{repo_url}" ])
+    return reckless_sourcelist(plugin)
 
 @plugin.method("reckless-sourcerm")
 def reckless_sourcerm(plugin, repo_url):
     '''reckless source rm'''
 
     # remove the entry
-    output = execute_reckless(params=[ "-r", "source", "remove", f"{repo_url}" ])
+    output = execute_reckless(params=[ "-r",  "source", "remove", f"{repo_url}" ])
 
-    return output
-    #reckless_sourcelist(plugin)
+    return reckless_sourcelist(plugin)
 
 @plugin.method("reckless-install")
 def reckless_install(plugin, plugin_name):
     '''reckless install <plugin_name>'''
 
-    return execute_reckless(params=[ "-r", "install", f"{plugin_name}" ])
+    install_output = execute_reckless(params=[ "-r",  "install", f"{plugin_name}" ])
+
+    install_output_lines = install_output.split('\n') 
+
+    if install_output_lines[0] == "":
+        install_output_lines = []
+
+    json_object = { "install_messages": install_output_lines }
+
+    return json_object
 
 @plugin.method("reckless-uninstall")
 def reckless_uninstall(plugin, plugin_name):
     '''reckless uninstall <plugin_name>'''
 
-    return execute_reckless(params=[ "-r", "uninstall", f"{plugin_name}" ])
+    uninstall_output = execute_reckless(params=[ "-r",  "uninstall", f"{plugin_name}" ])
+
+    uninstall_output_lines = uninstall_output.split('\n') 
+
+    if uninstall_output_lines[0] == "":
+        uninstall_output_lines = []
+
+    json_object = { "uninstall_messages": uninstall_output_lines }
+
+    return json_object
 
 @plugin.method("reckless-search")
 def reckless_search(plugin, plugin_name):
     '''reckless search <plugin_name>'''
 
-    return execute_reckless(params=[ "-r", "search", f"{plugin_name}" ])
+    search_results = execute_reckless(params=[ "-r",  "search", f"{plugin_name}" ])
+
+    search_results_lines = search_results.split('\n')
+
+    if search_results_lines[0] == "":
+        search_results_lines = []
+
+    json_object = { "search_results": search_results_lines } 
+
+    return json_object
 
 @plugin.method("reckless-disable")
 def reckless_disable(plugin, plugin_name):
     '''reckless help'''
 
-    return execute_reckless(params=[ "-r", "disable", f"{plugin_name}" ])
+    return execute_reckless(params=[ "-r",  "disable", f"{plugin_name}" ])
 
 plugin.run()  # Run our plugin
