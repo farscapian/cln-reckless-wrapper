@@ -1,9 +1,21 @@
 #!/usr/bin/env python3
-import json
-import os
-import re
-import subprocess
-from pyln.client import Plugin, RpcError
+
+try:
+
+    import json
+    import os
+    import re
+    import subprocess
+    from pyln.client import Plugin, RpcError
+except ModuleNotFoundError as err:
+    # OK, something is not installed?
+    import json
+    import sys
+    getmanifest = json.loads(sys.stdin.readline())
+    print(json.dumps({'jsonrpc': "2.0",
+                      'id': getmanifest['id'],
+                      'result': {'disable': str(err)}}))
+    sys.exit(1)
 
 plugin = Plugin()
 
@@ -17,7 +29,9 @@ def init(options, configuration, plugin, **kwargs):
 def execute_reckless(params=""):
 
     output = None
-    cln_network = plugin.rpc.getinfo()["network"]
+    getinfo_result = plugin.rpc.getinfo()
+    cln_network = getinfo_result["network"]
+    lightning_dir = plugin.rpc.listconfigs("lightning-dir")["configs"]["lightning-dir"]["value_str"]
     allowable_networks = ["regtest", "bitcoin", "liquid", "liquid-regtest", "litecoin", "signet"]
 
     if cln_network not in allowable_networks:
@@ -27,11 +41,22 @@ def execute_reckless(params=""):
     try:
         env_params = []
         env_params.append(f"--network={cln_network}")
-        env_params.append("-d")
-        env_params.append("/reckless-plugins")
+        env_params.append(f"--lightning")
+        env_params.append(lightning_dir)
+
+        cln_plugin_path = None
+
+        if 'PLUGIN_PATH' in os.environ:
+            cln_plugin_path = os.environ['PLUGIN_PATH']
+            plugin.log(f"cln_plugin_path: {cln_plugin_path}")
+            env_params.append(f"--reckless-dir")
+            env_params.append(cln_plugin_path)
 
         reckless_script_path = f"reckless"
         result = None
+        plugin.log(reckless_script_path)
+        plugin.log(f"env_params: {env_params}")
+        plugin.log(f"params: {params}")
         result = subprocess.run([reckless_script_path] + env_params + params, stdout=subprocess.PIPE, text=True, check=True)
         output = result.stdout
         
@@ -127,6 +152,6 @@ def reckless_install(plugin, subcommand: None, plugin_name=None, git_commit=None
     elif subcommand == "disable":
         return execute_reckless(params=[ "disable", f"{plugin_name}" ])
     else:
-        return execute_reckless(params=[ "help" ])
+        raise Exception("Invalid subcommand.")
 
 plugin.run()
