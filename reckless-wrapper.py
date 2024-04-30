@@ -45,17 +45,15 @@ def execute_reckless(params=""):
         return e
 
     return_output = output.strip()
+    plugin.log(f"return_output: {return_output}", "info")
 
     return return_output
 
-
-
-def reckless_sourcelist(plugin):
-    '''reckless source list'''
-    
+def reckless_sourcelist():
     reckless_output = execute_reckless(params=[ "source", "list" ])
-
     sources = reckless_output.split('\n') 
+
+    plugin.log(f"source: {sources}", "info")
 
     if sources[0] == "":
         sources = []
@@ -65,46 +63,53 @@ def reckless_sourcelist(plugin):
     return json_object
     
 @plugin.method("reckless-source")
-def reckless_sourceadd(plugin, subcommand: None, repo_url: None):
+def reckless_source(plugin, subcommand: None, repo_url=""):
     '''reckless source subcommand=[add|remove] repo_url='''
 
-    if subcommand == "list":
-        reckless_output = execute_reckless(params=[ "source", "list" ])
-        sources = reckless_output.split('\n') 
+    plugin.log(f"reckless-source {subcommand} {repo_url}", "info")
+    allowed_subcommands = ["add", "remove", "list"]
 
-        if sources[0] == "":
-            sources = []
+    if subcommand not in allowed_subcommands:
+        raise Exception("Allowed subcommands are add/remove/list.")
 
-        json_object = { "sources": sources }
+    if subcommand != "list":
+        if repo_url == "":
+            raise Exception(f"You must provide a repo_url when running reckless source {subcommand}")
 
-        return json_object
-
-    elif subcommand == "add":
-        execute_reckless(params=[ "source", "add", f"{repo_url}" ])
-
-        return reckless_sourcelist(plugin)
-    elif subcommand == "remove":
-        # remove the entry
-        output = execute_reckless(params=[ "source", "remove", f"{repo_url}" ])
-
-        return reckless_sourcelist(plugin)
-    else:
-        raise Exception("Subcommand must be either add, remove, or list.")
+        execute_reckless(params=[ "source", f"{subcommand}", f"{repo_url}"])
+        
+    return reckless_sourcelist()
 
 @plugin.method("reckless")
 def reckless_install(plugin, subcommand: None, plugin_name: None, git_commit=None):
-    '''reckless install|uninstall|search|enable|disable plugin_name'''
+    '''reckless search|install|uninstall|enable|disable plugin_name'''
 
-    if subcommand == "install":
+    if subcommand == "search":
+        search_results = execute_reckless(params=[ "search", f"{plugin_name}" ])
+        search_results_lines = search_results.split('\n')
+
+        if search_results_lines[0] == "":
+            search_results_lines = []
+
+        json_object = { "search_results": search_results_lines } 
+
+        return json_object
+
+    elif subcommand == "install":
         # TODO git_commit
-        install_output = execute_reckless(params=[ "install", f"{plugin_name}" ])
+        params=[ "install", f"{plugin_name}" ]
+
+        if git_commit != None:
+            params.append(f"{git_commit}")
+
+        install_output = execute_reckless(params)
 
         install_output_lines = install_output.split('\n') 
 
         if install_output_lines[0] == "":
             install_output_lines = []
 
-        json_object = { "install_messages": install_output_lines }
+        json_object = { "install_output": install_output_lines }
 
         return json_object
     elif subcommand == "uninstall":
@@ -115,22 +120,11 @@ def reckless_install(plugin, subcommand: None, plugin_name: None, git_commit=Non
         if uninstall_output_lines[0] == "":
             uninstall_output_lines = []
 
-        json_object = { "uninstall_messages": uninstall_output_lines }
+        json_object = { "uninstall_output": uninstall_output_lines }
 
         return json_object
 
-    elif subcommend == "search":
 
-        search_results = execute_reckless(params=[ "search", f"{plugin_name}" ])
-
-        search_results_lines = search_results.split('\n')
-
-        if search_results_lines[0] == "":
-            search_results_lines = []
-
-        json_object = { "search_results": search_results_lines } 
-
-        return json_object
     elif subcommend == "enable":
         return execute_reckless(params=[ "enable", f"{plugin_name}" ])
     elif subcommend == "disable":
