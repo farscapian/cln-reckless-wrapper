@@ -5,14 +5,12 @@ import re
 import subprocess
 from pyln.client import Plugin, RpcError
 
-#plugin_path = os.path.join(os.path.dirname(__file__), '../bolt12-prism.py')
-
 plugin = Plugin()
 
 @plugin.init()  # this runs when the plugin starts.
 def init(options, configuration, plugin, **kwargs):
 
-    plugin.log("initializing cln-reckless-wrapper.py.")
+    plugin.log("initializing reckless-wrapper.py.")
 
 # this is called by all the other rpc methods.
 # each invoker passes params.
@@ -32,7 +30,7 @@ def execute_reckless(params=""):
         env_params.append("-d")
         env_params.append("/reckless-plugins")
 
-        reckless_script_path = f"/usr/local/bin/reckless"
+        reckless_script_path = f"reckless"
         result = None
         result = subprocess.run([reckless_script_path] + env_params + params, stdout=subprocess.PIPE, text=True, check=True)
         output = result.stdout
@@ -81,7 +79,7 @@ def reckless_source(plugin, subcommand: None, repo_url=""):
     return reckless_sourcelist()
 
 @plugin.method("reckless")
-def reckless_install(plugin, subcommand: None, plugin_name: None, git_commit=None):
+def reckless_install(plugin, subcommand: None, plugin_name=None, git_commit=None):
     '''reckless search|install|uninstall|enable|disable plugin_name'''
 
     if subcommand == "search":
@@ -124,10 +122,9 @@ def reckless_install(plugin, subcommand: None, plugin_name: None, git_commit=Non
 
         return json_object
 
-
-    elif subcommend == "enable":
+    elif subcommand == "enable":
         return execute_reckless(params=[ "enable", f"{plugin_name}" ])
-    elif subcommend == "disable":
+    elif subcommand == "disable":
         return execute_reckless(params=[ "disable", f"{plugin_name}" ])
     else:
         return execute_reckless(params=[ "help" ])
