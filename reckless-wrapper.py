@@ -59,6 +59,7 @@ def execute_reckless(params=""):
         plugin.log(f"params: {params}")
         result = subprocess.run([reckless_script_path] + env_params + params, stdout=subprocess.PIPE, text=True, check=True)
         output = result.stdout
+       # debug_output = result.debug_output
         
         if result.stderr:
             plugin.log(error_output)
@@ -107,6 +108,11 @@ def reckless_source(plugin, subcommand: None, repo_url=""):
 def reckless_install(plugin, subcommand: None, plugin_name=None, git_commit=None):
     '''reckless search|install|uninstall|enable|disable plugin_name'''
 
+    allowed_subcommands = [ "search", "install", "uninstall", "enable", "disable", "list" ]
+    if subcommand not in allowed_subcommands:
+        raise Exception("Invalid subcommand.")
+
+
     if subcommand == "search":
         search_results = execute_reckless(params=[ "search", f"{plugin_name}" ])
         search_results_lines = search_results.split('\n')
@@ -147,11 +153,14 @@ def reckless_install(plugin, subcommand: None, plugin_name=None, git_commit=None
 
         return json_object
 
+    elif subcommand == "list":
+        #reckless_list_output = execute_reckless(params=[ "list" ] )
+        # TODO convert this output to JSON response with reckless-managed 
+        raise NotImplemented("TODO this needs to be implemented.")
     elif subcommand == "enable":
         return execute_reckless(params=[ "enable", f"{plugin_name}" ])
     elif subcommand == "disable":
         return execute_reckless(params=[ "disable", f"{plugin_name}" ])
-    else:
-        raise Exception("Invalid subcommand.")
+
 
 plugin.run()
