@@ -88,7 +88,7 @@ def reckless_sourcelist():
     
 @plugin.method("reckless-source")
 def reckless_source(plugin, subcommand: None, repo_url=""):
-    '''reckless source subcommand=[add|remove] repo_url='''
+    '''reckless source subcommand=[add|remove|list] repo_url='''
 
     plugin.log(f"reckless-source {subcommand} {repo_url}", "info")
     allowed_subcommands = ["add", "remove", "list"]
@@ -111,7 +111,6 @@ def reckless_install(plugin, subcommand: None, plugin_name=None, git_commit=None
     allowed_subcommands = [ "search", "install", "uninstall", "enable", "disable", "list" ]
     if subcommand not in allowed_subcommands:
         raise Exception("Invalid subcommand.")
-
 
     if subcommand == "search":
         search_results = execute_reckless(params=[ "search", f"{plugin_name}" ])
