@@ -12,6 +12,8 @@ A CLN plugin that exposes the reckless shell script functionality as CLN RPC met
 
 ### List Source Repos
 
+> NOTE: advocate that we place this under `lightning-cli plugin source list`
+
 `lightning-cli.sh reckless-source list`
 ```json
 {
@@ -22,6 +24,8 @@ A CLN plugin that exposes the reckless shell script functionality as CLN RPC met
 ```
 
 ### Add a source repo with CLN plugin code
+
+> NOTE: advocate that we place this under `lightning-cli plugin source add`
 
 If you're developing a new plugin, you can add it as a source:
 
@@ -37,6 +41,8 @@ If you're developing a new plugin, you can add it as a source:
 ```
 
 ### Remove a source repo
+
+> NOTE: advocate that we place this under `lightning-cli plugin source remove`
 
 You can remove the source:
 
@@ -63,6 +69,8 @@ TODO
 ```
 
 ### Uninstalling a plugin
+
+> TODO adovcate that we move this under `lightning-cli plugin uninstall`
 
 `lightning-cli.sh reckless uninstall bolt12-prism`
 ```json
