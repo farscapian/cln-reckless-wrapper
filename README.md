@@ -4,6 +4,12 @@ A CLN plugin that exposes the reckless shell script functionality as CLN RPC met
 
 ## Source Management
 
+
+### Add Trusted GPG Keys
+
+> TODO there needs to be a way to upload/identify GPG pubkey that is trusted. Then when adding source, logic will ensure that GPG signatures are checked on git tags.
+
+
 ### List Source Repos
 
 `lightning-cli.sh reckless-source list`
@@ -32,7 +38,7 @@ If you're developing a new plugin, you can add it as a source:
 
 ### Remove a source repo
 
-Similarly, if you're developing a new plugin, you can add it as a source:
+You can remove the source:
 
 `lightning-cli.sh reckless-source remove https://github.com/userx/some-other-cln-plugin`
 
@@ -46,12 +52,14 @@ Similarly, if you're developing a new plugin, you can add it as a source:
 
 ## Installing a plugin
 
-Just having the source defined is not enough! You have to run the `reckless install` command.
+> TODO adovcate that we move this under `lightning-cli plugin install`
+
+Just having the source defined is not enough! You have to run the `reckless install` command before the plugin becomes available.
 
 `lightning-cli.sh reckless install bolt12-prism`
 
 ```json
-
+TODO
 ```
 
 ### Uninstalling a plugin
